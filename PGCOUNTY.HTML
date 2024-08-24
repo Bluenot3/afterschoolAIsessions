@@ -1,0 +1,143 @@
+import React, { useState } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+
+const Slide = ({ children, background }) => (
+  <div className="w-full h-full flex flex-col justify-center items-center p-8 text-center" style={{ background }}>
+    {children}
+  </div>
+);
+
+const Button = ({ onClick, children }) => (
+  <button
+    onClick={onClick}
+    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-300"
+  >
+    {children}
+  </button>
+);
+
+const Presentation = () => {
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const slides = [
+    {
+      content: (
+        <Slide background="linear-gradient(135deg, #667eea 0%, #764ba2 100%)">
+          <h1 className="text-5xl font-bold text-white mb-4">ZEN AI Literacy Program</h1>
+          <h2 className="text-3xl text-white mb-8">In partnership with Boys & Girls Clubs of Greater Washington</h2>
+          <p className="text-xl text-white">Empowering the Next Generation with AI Skills</p>
+        </Slide>
+      )
+    },
+    {
+      content: (
+        <Slide background="linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%)">
+          <h2 className="text-4xl font-bold text-gray-800 mb-6">Program Overview</h2>
+          <ul className="text-left text-xl text-gray-800">
+            <li className="mb-4">✓ 10-week intensive course</li>
+            <li className="mb-4">✓ 2-3 sessions per week, 1 hour each</li>
+            <li className="mb-4">✓ Hands-on, project-based learning</li>
+            <li className="mb-4">✓ Covering AI fundamentals to advanced applications</li>
+            <li>✓ Tailored for afterschool engagement</li>
+          </ul>
+        </Slide>
+      )
+    },
+    {
+      content: (
+        <Slide background="linear-gradient(135deg, #5ee7df 0%, #b490ca 100%)">
+          <h2 className="text-4xl font-bold text-gray-800 mb-6">Curriculum Highlights</h2>
+          <div className="grid grid-cols-2 gap-4 text-left">
+            <div>
+              <h3 className="text-2xl font-semibold mb-2">Weeks 1-5</h3>
+              <ul className="list-disc list-inside">
+                <li>Introduction to AI</li>
+                <li>Python Basics</li>
+                <li>Data Science Fundamentals</li>
+                <li>Machine Learning Concepts</li>
+                <li>Natural Language Processing</li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-2xl font-semibold mb-2">Weeks 6-10</h3>
+              <ul className="list-disc list-inside">
+                <li>Computer Vision</li>
+                <li>AI Ethics</li>
+                <li>AI in Various Fields</li>
+                <li>Building AI Projects</li>
+                <li>Project Showcase</li>
+              </ul>
+            </div>
+          </div>
+        </Slide>
+      )
+    },
+    {
+      content: (
+        <Slide background="linear-gradient(135deg, #f6d365 0%, #fda085 100%)">
+          <h2 className="text-4xl font-bold text-gray-800 mb-6">Innovative Teaching Methods</h2>
+          <ul className="text-left text-xl text-gray-800">
+            <li className="mb-4">🤝 Peer-to-Peer Learning</li>
+            <li className="mb-4">🎨 AI Art Gallery</li>
+            <li className="mb-4">🕵️ Real-world AI Scavenger Hunt</li>
+            <li className="mb-4">🎮 Gamified Learning Progress</li>
+            <li>🌍 "AI for Good" Challenge</li>
+          </ul>
+        </Slide>
+      )
+    },
+    {
+      content: (
+        <Slide background="linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)">
+          <h2 className="text-4xl font-bold text-gray-800 mb-6">Benefits for Participants</h2>
+          <ul className="text-left text-xl text-gray-800">
+            <li className="mb-4">🚀 Gain cutting-edge technology skills</li>
+            <li className="mb-4">💡 Develop critical thinking and problem-solving abilities</li>
+            <li className="mb-4">🤖 Understand AI's impact on society and future careers</li>
+            <li className="mb-4">🏆 Build confidence through project completion</li>
+            <li>🌐 Prepare for the AI-driven future</li>
+          </ul>
+        </Slide>
+      )
+    },
+    {
+      content: (
+        <Slide background="linear-gradient(135deg, #667eea 0%, #764ba2 100%)">
+          <h2 className="text-4xl font-bold text-white mb-6">Join the AI Revolution!</h2>
+          <p className="text-2xl text-white mb-8">Empower the next generation with essential AI skills</p>
+          <Button onClick={() => alert('Registration form would open here')}>
+            Register Now
+          </Button>
+          <p className="mt-8 text-xl text-white">For more information, contact:</p>
+          <p className="text-xl text-white">info@zenai-literacy.org | (202) 555-0123</p>
+        </Slide>
+      )
+    }
+  ];
+
+  const nextSlide = () => {
+    setCurrentSlide((prev) => (prev + 1) % slides.length);
+  };
+
+  const prevSlide = () => {
+    setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
+  };
+
+  return (
+    <div className="w-full h-screen flex flex-col justify-center items-center bg-gray-100">
+      <div className="w-4/5 h-4/5 bg-white rounded-lg shadow-2xl overflow-hidden">
+        {slides[currentSlide].content}
+      </div>
+      <div className="mt-4 flex justify-center items-center">
+        <Button onClick={prevSlide}>
+          <ChevronLeft size={24} />
+        </Button>
+        <span className="mx-4 text-xl">{currentSlide + 1} / {slides.length}</span>
+        <Button onClick={nextSlide}>
+          <ChevronRight size={24} />
+        </Button>
+      </div>
+    </div>
+  );
+};
+
+export default Presentation;
