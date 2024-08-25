@@ -1,0 +1,296 @@
+<html><head><base href="https://websim.ai/advanced-generative-ai-simulator/">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSim AI - Advanced Generative AI Simulator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1, h2 {
+            color: #2c3e50;
+            text-align: center;
+        }
+        .simulator-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .simulator {
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+        }
+        input[type="range"] {
+            width: 60%;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .output {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            font-family: monospace;
+            height: 150px;
+            overflow-y: auto;
+            font-size: 12px;
+        }
+        .visualization {
+            margin-top: 20px;
+        }
+        .network-visualization {
+            width: 100%;
+            height: 200px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/vis-network.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>WebSim AI - Advanced Generative AI Simulator</h1>
+        <div class="simulator-grid" id="simulatorGrid"></div>
+    </div>
+
+    <script>
+        const simulatorTypes = [
+            { name: "Text Generation", icon: "📝" },
+            { name: "Image Recognition", icon: "🖼️" },
+            { name: "Speech Synthesis", icon: "🗣️" },
+            { name: "Natural Language Processing", icon: "🔠" },
+            { name: "Reinforcement Learning", icon: "🎮" },
+            { name: "Anomaly Detection", icon: "🔍" },
+            { name: "Time Series Prediction", icon: "📈" },
+            { name: "Recommendation System", icon: "👍" }
+        ];
+
+        function createSimulator(type, index) {
+            const simulator = document.createElement('div');
+            simulator.className = 'simulator';
+            simulator.innerHTML = `
+                <h2>${type.icon} ${type.name}</h2>
+                <div class="controls">
+                    <label>Model Complexity: <input type="range" class="complexity" min="1" max="10" value="5"></label>
+                    <label>Dataset Size: <input type="range" class="dataset" min="1" max="10" value="5"></label>
+                    <label>Learning Rate: <input type="range" class="learning-rate" min="1" max="10" value="5"></label>
+                    <label>Epochs: <input type="range" class="epochs" min="1" max="10" value="5"></label>
+                </div>
+                <button class="generate">Generate Output</button>
+                <div class="output"></div>
+                <div class="visualization">
+                    <h3>Neural Network Visualization</h3>
+                    <div class="network-visualization"></div>
+                </div>
+            `;
+
+            const generateButton = simulator.querySelector('.generate');
+            const output = simulator.querySelector('.output');
+            const networkContainer = simulator.querySelector('.network-visualization');
+
+            // Initialize network visualization
+            const data = {
+                nodes: new vis.DataSet([]),
+                edges: new vis.DataSet([])
+            };
+            const options = {
+                nodes: {
+                    shape: 'dot',
+                    size: 10,
+                    font: { size: 12, color: '#333' },
+                    borderWidth: 2
+                },
+                edges: {
+                    width: 1,
+                    color: { color:'#cccccc', highlight:'#3498db' }
+                },
+                physics: {
+                    stabilization: false,
+                    barnesHut: {
+                        gravitationalConstant: -80000,
+                        springConstant: 0.001,
+                        springLength: 200
+                    }
+                }
+            };
+            const network = new vis.Network(networkContainer, data, options);
+
+            function updateNetwork() {
+                const complexity = parseInt(simulator.querySelector('.complexity').value);
+                const nodes = [];
+                const edges = [];
+
+                // Input layer
+                for (let i = 0; i < 3; i++) {
+                    nodes.push({id: i, label: `I${i+1}`, level: 0});
+                }
+
+                // Hidden layers
+                const hiddenLayers = Math.floor(complexity / 3) + 1;
+                let nodeId = 3;
+                for (let layer = 1; layer <= hiddenLayers; layer++) {
+                    const nodesInLayer = Math.floor(complexity * 0.7);
+                    for (let i = 0; i < nodesInLayer; i++) {
+                        nodes.push({id: nodeId, label: `H${layer}-${i+1}`, level: layer});
+                        // Connect to previous layer
+                        if (layer === 1) {
+                            for (let j = 0; j < 3; j++) {
+                                edges.push({from: j, to: nodeId});
+                            }
+                        } else {
+                            for (let j = nodeId - nodesInLayer - 1; j < nodeId; j++) {
+                                edges.push({from: j, to: nodeId});
+                            }
+                        }
+                        nodeId++;
+                    }
+                }
+
+                // Output layer
+                for (let i = 0; i < 2; i++) {
+                    nodes.push({id: nodeId + i, label: `O${i+1}`, level: hiddenLayers + 1});
+                    for (let j = nodeId - Math.floor(complexity * 0.7); j < nodeId; j++) {
+                        edges.push({from: j, to: nodeId + i});
+                    }
+                }
+
+                data.nodes.clear();
+                data.edges.clear();
+                data.nodes.add(nodes);
+                data.edges.add(edges);
+            }
+
+            function generateOutput() {
+                const complexity = parseInt(simulator.querySelector('.complexity').value);
+                const dataset = parseInt(simulator.querySelector('.dataset').value);
+                const learningRate = parseInt(simulator.querySelector('.learning-rate').value);
+                const epochs = parseInt(simulator.querySelector('.epochs').value);
+
+                let generatedText = `Simulating ${type.name}...\n\n`;
+
+                // Simulate AI processing
+                for (let i = 0; i < epochs; i++) {
+                    generatedText += `Epoch ${i + 1}/${epochs}: `;
+                    for (let j = 0; j < complexity; j++) {
+                        generatedText += ".";
+                    }
+                    generatedText += `\nLoss: ${(Math.random() * (10 - learningRate/2) / (i+1)).toFixed(4)}\n`;
+                }
+
+                generatedText += `\n${type.name} Output:\n`;
+
+                // Generate type-specific output
+                switch(type.name) {
+                    case "Text Generation":
+                        generatedText += `Generated text: "${generateRandomText(complexity)}"\n`;
+                        break;
+                    case "Image Recognition":
+                        generatedText += `Recognized object: ${generateRandomObject()} (confidence: ${(Math.random() * 100).toFixed(2)}%)\n`;
+                        break;
+                    case "Speech Synthesis":
+                        generatedText += `Synthesized speech: "${generateRandomText(complexity)}"\nDuration: ${(Math.random() * 10).toFixed(2)} seconds\n`;
+                        break;
+                    case "Natural Language Processing":
+                        generatedText += `Analyzed sentiment: ${generateRandomSentiment()}\nIdentified entities: ${generateRandomEntities(complexity)}\n`;
+                        break;
+                    case "Reinforcement Learning":
+                        generatedText += `Agent action: ${generateRandomAction()}\nReward: ${(Math.random() * 100).toFixed(2)}\n`;
+                        break;
+                    case "Anomaly Detection":
+                        generatedText += `Anomaly detected: ${Math.random() > 0.7 ? "Yes" : "No"}\nAnomaly score: ${(Math.random()).toFixed(4)}\n`;
+                        break;
+                    case "Time Series Prediction":
+                        generatedText += `Predicted value: ${(Math.random() * 1000).toFixed(2)}\nConfidence interval: ±${(Math.random() * 50).toFixed(2)}\n`;
+                        break;
+                    case "Recommendation System":
+                        generatedText += `Top recommendations:\n${generateRandomRecommendations(complexity)}\n`;
+                        break;
+                }
+
+                output.textContent = generatedText;
+            }
+
+            generateButton.addEventListener('click', () => {
+                updateNetwork();
+                generateOutput();
+            });
+
+            // Initial network generation
+            updateNetwork();
+
+            return simulator;
+        }
+
+        function generateRandomText(length) {
+            const words = ["the", "quick", "brown", "fox", "jumps", "over", "lazy", "dog", "artificial", "intelligence", "machine", "learning", "neural", "network"];
+            return Array(length).fill().map(() => words[Math.floor(Math.random() * words.length)]).join(" ");
+        }
+
+        function generateRandomObject() {
+            const objects = ["cat", "dog", "car", "house", "tree", "person", "bird", "flower"];
+            return objects[Math.floor(Math.random() * objects.length)];
+        }
+
+        function generateRandomSentiment() {
+            const sentiments = ["Positive", "Negative", "Neutral"];
+            return sentiments[Math.floor(Math.random() * sentiments.length)];
+        }
+
+        function generateRandomEntities(count) {
+            const entities = ["Person", "Organization", "Location", "Date", "Time", "Money", "Percent"];
+            return Array(count).fill().map(() => entities[Math.floor(Math.random() * entities.length)]).join(", ");
+        }
+
+        function generateRandomAction() {
+            const actions = ["Move left", "Move right", "Jump", "Duck", "Attack", "Defend"];
+            return actions[Math.floor(Math.random() * actions.length)];
+        }
+
+        function generateRandomRecommendations(count) {
+            const items = ["Book", "Movie", "Song", "Product", "Restaurant", "Game"];
+            return Array(count).fill().map((_, i) => `${i+1}. ${items[Math.floor(Math.random() * items.length)]} ${Math.floor(Math.random() * 1000)}`).join("\n");
+        }
+
+        // Create simulators
+        const simulatorGrid = document.getElementById('simulatorGrid');
+        simulatorTypes.forEach((type, index) => {
+            const simulator = createSimulator(type, index);
+            simulatorGrid.appendChild(simulator);
+        });
+    </script>
+</body></html>
